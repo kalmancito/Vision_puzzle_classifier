@@ -1,18 +1,19 @@
 close all
 
-% %%
-% %  webcamlist
+%%
+%   webcamlist
 % % cam = webcam(1)
 %    preview(cam)
 % % 
-% % closePreview(cam)
+%  closePreview(cam)
+% %%
 % %  cam.AvailableResolutions
-% %  cam.resolution='960x720'
+% cam.resolution='1280x1024'
 % cam. ExposureMode='auto'
-% cam.Exposure=-9
+% % cam.Exposure=-8
 %%
 %    img = snapshot(cam);
-img=imread('C:\Users\Alicia\Desktop\MUAR\puzzle_vision_prueba.png');
+img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\puzzle_vision_prueba.png');
 imshow(img)
 
 % subplot(1,3,1);imshow(img(:,:,1))
@@ -54,14 +55,29 @@ imshow(bw)
 imshow(L)
 title('binarized image')
 % a=(L==1);imshow(a)
+
+%%
+
+
+CC = bwconncomp(bw);
+LL = labelmatrix(CC);
+figure
+imshow(label2rgb(LL));
 %%
 
 caract=regionprops(L,'all');
 % imshow(L==3)
 % caract(3).Area
 % caract(3).BoundingBox
+% caract(3).ConvexHull
 centroids = cat(1, caract.Centroid);
 
+%%
+
+STATS = regionprops(L, 'Image', 'SubarrayIdx');
+imMask = STATS(2).Image;
+subImage = L(STATS(2).SubarrayIdx{:});
+imshow(subImage)
 %%
 
 imshow(bw)
@@ -69,22 +85,50 @@ hold on
 plot(centroids(:,1),centroids(:,2), 'b*')
 hold off
 %%
-figure(555)
+% figure(555)
 
-for i=1:num
-ROI_c{i}=imcrop(img,[caract(i).BoundingBox]);
-% angulo=caract(i).Orientation;
-% ROI_c{i}=imrotate(ROI_c{i},angulo,'bilinear','crop');
+for i=2:num
+% ROI_cH{i}=imcrop(img,[caract(i).ConvexHull]);
+
+% mask=poly2mask(,147,168)
+% ROI_c{i}=imcrop(img,[caract(i).BoundingBox]);
+% ROI_mask{i}=caract(i).ConvexImage;
+II=imcrop(I,[caract(i).BoundingBox]);
+M=caract(i).ConvexImage;
+% Inew{i}=ROI_c{i}.*ROI_mask{i};
+Inew = II(2:end,2:end,:).*uint8(repmat(M,[1,1,3]));
+
+% figure(i*100);imshow(Inew)
+ROI_c{i}=Inew;
+% ang=caract(i).Orientation
+
+%-------------------------------------------
+
+sides = caract(i).Extrema(4,:) - caract(i).Extrema(6,:); % Returns the sides of the square triangle that completes th
+
+
+ang = rad2deg(atan(-sides(2)/sides(1))) 
+
+%------------------------------------------
+ROI_c_r{i}=imrotate(ROI_c{i},-ang,'bilinear');
 % caract(i).Solidity
-caract(i).Centroid
+% caract(i).Centroid
 % caract(i).Area
-subplot(1,num,i)
-imshow(ROI_c{i})
+% figure
+% subplot(2,round(num/2),i)
+figure;imshow(ROI_c_r{i})
 title(num2str(i))
 end
 %%
-imshow(rgb2gray(ROI_c{3}))
-I=rgb2gray(ROI_c{3});
+stop
+
+%%
+
+ROI_c=ROI_c_r;
+%%
+nt=8;
+imshow(rgb2gray(ROI_c_r{nt}))
+I=rgb2gray(ROI_c_r{nt});
 % [~, threshold] = edge(I, 'canny');
 % fudgeFactor = .5;
 BWs = edge(I,'canny');
@@ -161,7 +205,7 @@ plot(xy_long(:,1),xy_long(:,2),'LineWidth',2,'Color','red');
 
 
 %%
-ROIp4=ROI_c{3};
+ROIp4=ROI_c{5};
 ROIp7=ROI_c{6};
 ROIp8=ROI_c{7};
 
@@ -202,8 +246,8 @@ test
 %%
 
 
-c3=caract(3).Area
-c3=caract(3).Solidity
+c3=caract(5).Area
+c3=caract(5).Solidity
 figure; imshow(ROIp4)
 
 ROIp4_bw=imbinarize(rgb2gray(ROIp4),'adaptive');
@@ -229,24 +273,24 @@ figure, imshow(BWdfill), title('cleared border image');
 kk=centroide(BWdfill)
 %%
 %%
-I=ROIp7_bw;
-[~, threshold] = edge(I, 'sobel');
-fudgeFactor = .5;
-BWs = edge(I,'sobel', threshold * fudgeFactor);
-figure, imshow(BWs), title('binary gradient mask');
-%
-se90 = strel('line', 3, 90);
-se0 = strel('line', 3, 0);
-BWsdil = imdilate(BWs, [se90 se0]);
-figure, imshow(BWsdil), title('dilated gradient mask');
-BWdfill = imfill(BWsdil, 'holes');
-figure, imshow(BWdfill);
-title('binary image with filled holes');
-% BWnobord = imclearborder(BWdfill, 4);
-figure, imshow(BWdfill), title('cleared border image');
-% imshow(ROIp4_bw)
-[L7,num7]=bwlabel(BWdfill,4);
-kk=centroide(BWdfill)
+% I=ROIp7_bw;
+% [~, threshold] = edge(I, 'sobel');
+% fudgeFactor = .5;
+% BWs = edge(I,'sobel', threshold * fudgeFactor);
+% figure, imshow(BWs), title('binary gradient mask');
+% %
+% se90 = strel('line', 3, 90);
+% se0 = strel('line', 3, 0);
+% BWsdil = imdilate(BWs, [se90 se0]);
+% figure, imshow(BWsdil), title('dilated gradient mask');
+% BWdfill = imfill(BWsdil, 'holes');
+% figure, imshow(BWdfill);
+% title('binary image with filled holes');
+% % BWnobord = imclearborder(BWdfill, 4);
+% figure, imshow(BWdfill), title('cleared border image');
+% % imshow(ROIp4_bw)
+% [L7,num7]=bwlabel(BWdfill,4);
+% kk=centroide(BWdfill)
 
 %%
 %%
@@ -268,17 +312,15 @@ figure, imshow(BWdfill), title('cleared border image');
 % imshow(ROIp4_bw)
 [L8,num8]=bwlabel(BWdfill,4);
 kk=centroide(BWdfill)
+imshow(ROI_c{7})
 %%
 
 c3=caract(5).Area;
 c3=caract(5).Solidity;
-figure;imshow(ROIp7)
+% figure;imshow(ROIp7)
 
 % ROIp7_bw=imbinarize(rgb2gray(ROIp7),'adaptive');imshow(ROIp7_bw)
 % [L7,num7]=bwlabel(ROIp7_bw,4);
 close all
 
 
-num4
-num7
-num8
