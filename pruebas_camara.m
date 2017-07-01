@@ -14,7 +14,7 @@ clc
 % % cam.Exposure=-8
 %%
 %    img = snapshot(cam);
-img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\puzzle_vision_prueba2.png ');
+img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\puzzle_vision_prueba.png ');
 
 
 % subplot(1,3,1);imshow(img(:,:,1))
@@ -103,7 +103,7 @@ M=caract(i).ConvexImage;
 Inew = II(2:end,2:end,:).*uint8(repmat(M,[1,1,3]));
 
 % figure(i*100);imshow(Inew)
-ROI_c{i}=Inew;
+ROI_c{i-1}=Inew;
 % ang=caract(i).Orientation
 
 %-------------------------------------------
@@ -114,14 +114,14 @@ sides = caract(i).Extrema(4,:) - caract(i).Extrema(6,:); % Returns the sides of 
 ang = rad2deg(atan(-sides(2)/sides(1))) ;
 
 %------------------------------------------
-ROI_c_r{i}=imrotate(ROI_c{i},-ang,'bilinear');
+ROI_c_r{i-1}=imrotate(ROI_c{i-1},-ang,'bilinear');
 % caract(i).Solidity
 % caract(i).Centroid
 % caract(i).Area
 % figure
 % subplot(2,round(num/2),i)
-figure;imshow(ROI_c_r{i})
-title(num2str(i))
+figure;imshow(ROI_c_r{i-1})
+title(num2str(i-1))
 end
 %%
 % 
@@ -159,14 +159,39 @@ ROI_c=ROI_c_r;
 %%
 for nt=2:num;
 % imshow(rgb2gray(ROI_c_r{nt}))
-I=rgb2gray(ROI_c_r{nt});
+I=rgb2gray(ROI_c_r{nt-1});
 % [~, threshold] = edge(I, 'canny');
 % fudgeFactor = .5;
-BWs = edge(I,'canny');
-figure, imshow(BWs), title('binary gradient mask');
+BWs{nt-1} = edge(I,'canny');
+figure, imshow(BWs{nt-1}), title('binary gradient mask');
 end
+
 %%
-for i=2:num-6
+ load binarymasks
+for mascara=1:num-2
+    for prueba=1:num-2
+        
+[numrows numcols]=size(BWs{mascara});
+
+DD = imresize(BWs{prueba},[numrows numcols]) ;
+
+H=DD|BWs{mascara};
+res(mascara,prueba)=sum(sum(H))/sum(sum(BWs{mascara}));
+res2(mascara)=sum(sum(BWs{mascara}));
+
+    end
+end
+
+size(res)
+ mesh(1./res)
+
+
+
+
+
+
+%%
+for i=6
 II=ROI_c{i};
 % imshow(rgb2gray(II))
 I=rgb2gray(II);
@@ -287,75 +312,7 @@ figure; imshow(ROIp4)
 
 ROIp4_bw=imbinarize(rgb2gray(ROIp4),'adaptive');
 ROIp8_bw=imbinarize(rgb2gray(ROIp8),'adaptive');
-%%
-I=ROIp4_bw;
-[~, threshold] = edge(I, 'sobel');
-fudgeFactor = .5;
-BWs = edge(I,'sobel', threshold * fudgeFactor);
-figure, imshow(BWs), title('binary gradient mask');
-%
-se90 = strel('line', 3, 90);
-se0 = strel('line', 3, 0);
-BWsdil = imdilate(BWs, [se90 se0]);
-figure, imshow(BWsdil), title('dilated gradient mask');
-BWdfill = imfill(BWsdil, 'holes');
-figure, imshow(BWdfill);
-title('binary image with filled holes');
-% BWnobord = imclearborder(BWdfill, 4);
-figure, imshow(BWdfill), title('cleared border image');
-% imshow(ROIp4_bw)
-[L4,num4]=bwlabel(BWdfill,4);
-kk=centroide(BWdfill)
-%%
-%%
-% I=ROIp7_bw;
-% [~, threshold] = edge(I, 'sobel');
-% fudgeFactor = .5;
-% BWs = edge(I,'sobel', threshold * fudgeFactor);
-% figure, imshow(BWs), title('binary gradient mask');
-% %
-% se90 = strel('line', 3, 90);
-% se0 = strel('line', 3, 0);
-% BWsdil = imdilate(BWs, [se90 se0]);
-% figure, imshow(BWsdil), title('dilated gradient mask');
-% BWdfill = imfill(BWsdil, 'holes');
-% figure, imshow(BWdfill);
-% title('binary image with filled holes');
-% % BWnobord = imclearborder(BWdfill, 4);
-% figure, imshow(BWdfill), title('cleared border image');
-% % imshow(ROIp4_bw)
-% [L7,num7]=bwlabel(BWdfill,4);
-% kk=centroide(BWdfill)
 
-%%
-%%
-I=ROIp8_bw;
-[~, threshold] = edge(I, 'sobel');
-fudgeFactor = .5;
-BWs = edge(I,'sobel', threshold * fudgeFactor);
-figure, imshow(BWs), title('binary gradient mask');
-%
-se90 = strel('line', 3, 90);
-se0 = strel('line', 3, 0);
-BWsdil = imdilate(BWs, [se90 se0]);
-figure, imshow(BWsdil), title('dilated gradient mask');
-BWdfill = imfill(BWsdil, 'holes');
-figure, imshow(BWdfill);
-title('binary image with filled holes');
-% BWnobord = imclearborder(BWdfill, 4);
-figure, imshow(BWdfill), title('cleared border image');
-% imshow(ROIp4_bw)
-[L8,num8]=bwlabel(BWdfill,4);
-kk=centroide(BWdfill)
-imshow(ROI_c{7})
-%%
-
-c3=caract(5).Area;
-c3=caract(5).Solidity;
-% figure;imshow(ROIp7)
-
-% ROIp7_bw=imbinarize(rgb2gray(ROIp7),'adaptive');imshow(ROIp7_bw)
-% [L7,num7]=bwlabel(ROIp7_bw,4);
 close all
 
 
