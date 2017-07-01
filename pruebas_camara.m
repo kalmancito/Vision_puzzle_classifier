@@ -14,7 +14,7 @@ clc
 % % cam.Exposure=-8
 %%
 %    img = snapshot(cam);
-img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\camion2.png');
+img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\puzzle_vision_prueba2.png ');
 
 
 % subplot(1,3,1);imshow(img(:,:,1))
@@ -98,7 +98,6 @@ for i=1:num
 II=imcrop(img,[caract(i).BoundingBox]);
 % II=rgb2hsv(II);
 M=caract(i).ConvexImage;
-% Inew{i}=ROI_c{i}.*ROI_mask{i};
 % Inew = II(2:end,2:end,:).*double(repmat(M,[1,1,3])); %para HSV
 Inew = II(2:end,2:end,:).*uint8(repmat(M,[1,1,3]));
 
@@ -124,39 +123,40 @@ figure;imshow(ROI_c_r{i})
 title(num2str(i))
 end
 %%
-
-for ii=2:num
-G=ROI_c_r{ii};
-[nrow ncol ~]=size(G)
-% naranja = [.26 .68 1];%HSV
-naranja=[237 159 121];% RGB
-for i=1:nrow
-    for j=1:ncol
-
-pixel(1:3) = double(G(i,j,:));
-ang_thres = 10; % degrees. You should change this to suit your needs
-ang(i,j) = acosd(dot(naranja/norm(naranja),pixel/norm(pixel)));
-mag_thres = 310; % You should change this to suit your needs
-mag(i,j) = norm(pixel);
-isnaranja(i,j) = ang(i,j) <= ang_thres & mag(i,j) >= mag_thres; % Apply both thresholds
-   
-    
-    end
-end
- tanto(ii)=sum(sum(isnaranja))/(nrow*ncol);
- 
- 
- figure;imshow(G)
- title(num2str(tanto(ii)))
-end
+% 
+% for ii=2:num
+% G=ROI_c_r{ii};
+% [nrow ncol ~]=size(G)
+% naranja = [.0867 .4092 0.944];%HSV
+% % naranja=[237 159 121];% RGB
+% for i=1:nrow
+%     for j=1:ncol
+% 
+% pixel(1:3) = double(G(i,j,:));
+% ang_thres = 15; % degrees. You should change this to suit your needs
+% ang(i,j) = acosd(dot(naranja/norm(naranja),pixel/norm(pixel)));
+% % mag_thres = 310; % You should change this to suit your needs
+% mag_thres =0.85;
+% mag(i,j) = norm(pixel);
+% isnaranja(i,j) = ang(i,j) <= ang_thres & mag(i,j) >= mag_thres; % Apply both thresholds
+%    
+%     
+%     end
+% end
+%  tanto(ii)=sum(sum(isnaranja))/(nrow*ncol);
+%  
+%  
+%  figure;imshow(G)
+%  title(num2str(tanto(ii)))
+% end
 %%
-stop
+
 
 %%
 
 ROI_c=ROI_c_r;
 %%
-nt=8;
+nt=5;
 imshow(rgb2gray(ROI_c_r{nt}))
 I=rgb2gray(ROI_c_r{nt});
 % [~, threshold] = edge(I, 'canny');
@@ -164,7 +164,7 @@ I=rgb2gray(ROI_c_r{nt});
 BWs = edge(I,'canny');
 figure, imshow(BWs), title('binary gradient mask');
 %%
-for i=2:num-9
+for i=2:num-6
 II=ROI_c{i};
 % imshow(rgb2gray(II))
 I=rgb2gray(II);
@@ -211,6 +211,9 @@ P = houghpeaks(H,5,'threshold',ceil(0.3*max(H(:))));
 x = theta(P(:,2));
 y = rho(P(:,1));
 plot(x,y,'s','color','black');
+
+close 
+
 
 lines = houghlines(I,theta,rho,P,'FillGap',5,'MinLength',7);
 figure, imshow(I), hold on
