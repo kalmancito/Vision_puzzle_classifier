@@ -75,11 +75,12 @@ caract=regionprops(L,'all');
 centroids = cat(1, caract.Centroid);
 
 %%
-
+for ii=2:num
 STATS = regionprops(L, 'Image', 'SubarrayIdx');
-imMask = STATS(2).Image;
-subImage = L(STATS(2).SubarrayIdx{:});
-imshow(subImage)
+imMask = STATS(ii).Image;
+subImage = L(STATS(ii).SubarrayIdx{:});
+figure; imshow(subImage)
+end
 %%
 
 imshow(bw)
@@ -89,7 +90,7 @@ hold off
 %%
 % figure(555)
 % img=rgb2hsv(img);
-for i=1:num
+for i=2:num
 % ROI_cH{i}=imcrop(img,[caract(i).ConvexHull]);
 
 % mask=poly2mask(,147,168)
@@ -156,13 +157,14 @@ end
 
 ROI_c=ROI_c_r;
 %%
-nt=5;
-imshow(rgb2gray(ROI_c_r{nt}))
+for nt=2:num;
+% imshow(rgb2gray(ROI_c_r{nt}))
 I=rgb2gray(ROI_c_r{nt});
 % [~, threshold] = edge(I, 'canny');
 % fudgeFactor = .5;
 BWs = edge(I,'canny');
 figure, imshow(BWs), title('binary gradient mask');
+end
 %%
 for i=2:num-6
 II=ROI_c{i};
