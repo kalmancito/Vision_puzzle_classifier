@@ -15,7 +15,7 @@ clc
 %%
 %    img = snapshot(cam);
 % img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\avion\aviona1.png ');
-img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\testm2.jpg ');
+img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\testm.jpg ');
 % img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\puzzle_vision_prueba.png ');
 
 % subplot(1,3,1);imshow(img(:,:,1))
@@ -36,7 +36,7 @@ surf(double(background(1:8:end,1:8:end))),zlim([0 255]);
 ax = gca;
 ax.YDir = 'reverse';
 
-bw = imbinarize(I,'adaptive');
+bw = imbinarize(I);
 imshow(bw)
 %%
 bw = bwareaopen(bw,300);
@@ -111,7 +111,7 @@ pause
 end
 
 
-stop
+% stop
 
 
 
@@ -145,10 +145,10 @@ for i=1:num
 % ROI_c{i}=imcrop(img,[caract(i).BoundingBox]);
 % ROI_mask{i}=caract(i).ConvexImage;
 II=imcrop(rgb2gray(img),[caract(i).BoundingBox]);
-corners{i-1}=detectSURFFeatures(II,'MetricThreshold',500);
+corners{i}=detectSURFFeatures(II,'MetricThreshold',500);
 
 imshow(II); hold on;
- plot(corners{i-1}.selectStrongest(5));
+ plot(corners{i}.selectStrongest(10));
 
 
 % II=rgb2hsv(II);
@@ -157,7 +157,7 @@ M=caract(i).ConvexImage;
 Inew = II(2:end,2:end,:).*uint8(repmat(M,[1,1,3]));
 
 % figure(i*100);imshow(Inew)
-ROI_c{i-1}=Inew;
+ROI_c{i}=Inew;
 % ang=caract(i).Orientation
 
 %-------------------------------------------
@@ -168,15 +168,17 @@ sides = caract(i).Extrema(4,:) - caract(i).Extrema(6,:); % Returns the sides of 
 ang = rad2deg(atan(-sides(2)/sides(1))) ;
 
 %------------------------------------------
-ROI_c_r{i-1}=imrotate(ROI_c{i-1},-ang,'bilinear');
+ROI_c_r{i}=imrotate(ROI_c{i},0,'bilinear');
 % caract(i).Solidity
 % caract(i).Centroid
 % caract(i).Area
 % figure
 % subplot(2,round(num/2),i)
-figure;imshow(ROI_c_r{i-1})
-title(num2str(i-1))
+figure;imshow(ROI_c_r{i})
+title(num2str(i))
 end
+
+
 %%
 % 
 % for ii=2:num
@@ -210,30 +212,36 @@ end
 %%
 
 ROI_c=ROI_c_r;
+% save('masks','ROI_c')
+load 
 %%
- load binarymasks
- BWs2=BWs;
- clear BWs
-for nt=2:num;
-% imshow(rgb2gray(ROI_c_r{nt}))
-I=rgb2gray(ROI_c_r{nt-1});
-% [~, threshold] = edge(I, 'canny');
-% fudgeFactor = .5;
-BWs{nt-1} = edge(I,'canny');
-figure, imshow(BWs{nt-1}), title('binary gradient mask');
-end
 
+load binarymasks
+
+BWs2=BWs;
+for nt=1:num
+     
+    numrows=125;
+    numcols=125;
+    I=rgb2gray(ROI_c_r{nt});
+    DD = imresize(I,[numrows numcols], 'bilinear') ;
+    % figure,imshow(DD)
+    BWs{nt} = edge(DD,'canny');
+    figure, imshow(BWs{nt}), title('binary gradient mask');
+end
+% save('binarymasks','BWs')
 %%
+
 kk=1;
-for mascara=1:num-2 %mascara=1:num-2
-    for prueba=1:num-2
+for mascara=1:num
+    for prueba=1:num
  
         masc=BWs2{mascara};      
 [numrows numcols]=size(masc);
+DD = imresize(BWs{prueba},[numrows numcols], 'bilinear') ;
 
-DD = imresize(BWs{prueba},[numrows numcols]) ;
-
-H{prueba}=DD~=BWs2{mascara};
+% figure;imshow(BWs{prueba})
+H{prueba}=DD|BWs2{mascara};
 % H=imfilter(DD,BWs2{mascara},'conv')
 
 % figure;imshow(H{prueba})
@@ -246,10 +254,10 @@ end
 res=1./res;
 size(res)
 
-%  mesh(res)
-imshow(H{1})
 
+% imshow(H{1})
 
+mesh(res)
 stop
 
 
