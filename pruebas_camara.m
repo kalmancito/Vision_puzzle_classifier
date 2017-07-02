@@ -14,8 +14,9 @@ clc
 % % cam.Exposure=-8
 %%
 %    img = snapshot(cam);
-img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\puzzle_vision_prueba.png ');
-
+% img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\avion\aviona1.png ');
+img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\testm2.jpg ');
+% img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\puzzle_vision_prueba.png ');
 
 % subplot(1,3,1);imshow(img(:,:,1))
 % subplot(1,3,2);imshow(img(:,:,2))
@@ -34,12 +35,6 @@ figure
 surf(double(background(1:8:end,1:8:end))),zlim([0 255]);
 ax = gca;
 ax.YDir = 'reverse';
-
-I2=I-background;
-imshow(I2)
-
-I3 = imadjust(I2);
-imshow(I3);
 
 bw = imbinarize(I,'adaptive');
 imshow(bw)
@@ -75,12 +70,65 @@ caract=regionprops(L,'all');
 centroids = cat(1, caract.Centroid);
 
 %%
-for ii=2:num
-STATS = regionprops(L, 'Image', 'SubarrayIdx');
-imMask = STATS(ii).Image;
-subImage = L(STATS(ii).SubarrayIdx{:});
-figure; imshow(subImage)
+j=0;
+STATS = regionprops(L,'all');
+for ii=1:length(STATS)
+% STATS = regionprops(L, 'Image', 'SubarrayIdx');
+        if (abs(STATS(ii).ConvexArea-(STATS(ii).Perimeter/4)^2)>7500)&&...
+                STATS(ii).Area>100000
+           %abs(STATS(ii).EquivDiameter-(STATS(ii).Perimeter/2))<26
+        j=j+1;
+        caract(j)=STATS(ii);
+        imMask = STATS(ii).Image;
+        subImage{j} = L(STATS(ii).SubarrayIdx{:});
+        figure; imshow(subImage{j})
+        end
 end
+num=j;
+%% GIRAR EL CUADRADO
+close all
+for kk=1:num
+% imshow(subImage{kk})
+% pause
+II=imcrop(rgb2gray(img),[caract(kk).BoundingBox]);
+%-------------------------------------------
+
+sides = caract(kk).Extrema(4,:) - caract(kk).Extrema(6,:); % Returns the sides of the square triangle that completes th
+
+
+ang = rad2deg(atan2(-sides(2),sides(1))) ;
+
+M=caract(kk).ConvexImage;
+Inew = II(2:end,2:end,:).*uint8(repmat(M,[1,1,1]));
+ROI_c{kk}=Inew;
+
+%------------------------------------------
+ROI_c_r{kk}=imrotate(ROI_c{kk},0,'bilinear');
+ROI_bordes{kk}=edge(ROI_c_r{kk},'sobel');
+
+imshow(ROI_c_r{kk})
+pause
+end
+
+
+stop
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 %%
 
 imshow(bw)
@@ -90,13 +138,19 @@ hold off
 %%
 % figure(555)
 % img=rgb2hsv(img);
-for i=2:num
+for i=1:num
 % ROI_cH{i}=imcrop(img,[caract(i).ConvexHull]);
 
 % mask=poly2mask(,147,168)
 % ROI_c{i}=imcrop(img,[caract(i).BoundingBox]);
 % ROI_mask{i}=caract(i).ConvexImage;
-II=imcrop(img,[caract(i).BoundingBox]);
+II=imcrop(rgb2gray(img),[caract(i).BoundingBox]);
+corners{i-1}=detectSURFFeatures(II,'MetricThreshold',500);
+
+imshow(II); hold on;
+ plot(corners{i-1}.selectStrongest(5));
+
+
 % II=rgb2hsv(II);
 M=caract(i).ConvexImage;
 % Inew = II(2:end,2:end,:).*double(repmat(M,[1,1,3])); %para HSV
@@ -157,6 +211,9 @@ end
 
 ROI_c=ROI_c_r;
 %%
+ load binarymasks
+ BWs2=BWs;
+ clear BWs
 for nt=2:num;
 % imshow(rgb2gray(ROI_c_r{nt}))
 I=rgb2gray(ROI_c_r{nt-1});
@@ -167,26 +224,33 @@ figure, imshow(BWs{nt-1}), title('binary gradient mask');
 end
 
 %%
- load binarymasks
-for mascara=1:num-2
+kk=1;
+for mascara=1:num-2 %mascara=1:num-2
     for prueba=1:num-2
-        
-[numrows numcols]=size(BWs{mascara});
+ 
+        masc=BWs2{mascara};      
+[numrows numcols]=size(masc);
 
 DD = imresize(BWs{prueba},[numrows numcols]) ;
 
-H=DD|BWs{mascara};
-res(mascara,prueba)=sum(sum(H))/sum(sum(BWs{mascara}));
-res2(mascara)=sum(sum(BWs{mascara}));
+H{prueba}=DD~=BWs2{mascara};
+% H=imfilter(DD,BWs2{mascara},'conv')
+
+% figure;imshow(H{prueba})
+res(mascara,prueba)=sum(sum(H{prueba}))/sum(sum(BWs2{mascara}));
+res2(mascara)=sum(sum(BWs2{mascara}));
 
     end
 end
-
+ close all
+res=1./res;
 size(res)
- mesh(1./res)
+
+%  mesh(res)
+imshow(H{1})
 
 
-
+stop
 
 
 
