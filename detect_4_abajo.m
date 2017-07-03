@@ -14,7 +14,7 @@ warning off
 % cam. ExposureMode='auto'
 % % cam.Exposure=-8
 %%
-img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\testm3.jpg ');
+img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\testm8.jpg ');
 
 I=rgb2gray(img);
 % I=imadjust(I);
@@ -75,32 +75,43 @@ clear II II2 II3
  j=0;
 for i=1:num
  
-    II=imcrop(rgb2hsv(img),[caract(i).BoundingBox]);
-
-II2=(1*II(:,:,1)-0*II(:,:,2)+0*II(:,:,3))./(0.57*(II(:,:,1)+II(:,:,2)+II(:,:,3)));
-II3=imbinarize((II2),0.9);
+%     II=imcrop(rgb2hsv(img),[caract(i).BoundingBox]);
+ II=imcrop(img,[caract(i).BoundingBox]);
+test{i}=II;
+II2=(1*II(:,:,1)-0*II(:,:,2)+0*II(:,:,3));%./(0.57*(II(:,:,1)+II(:,:,2)+II(:,:,3)));
+II3=imbinarize((1-II2),0.85);
 Ic(i)=sum(sum(II3))/caract(i).Area;
 
 %         figure; imshow(II3)
 %         title([num2str(Ic(i))])
         
-    if(Ic(i))>0.06
+    if(Ic(i))>0.1
+        % estan detectadas las 4 de abajo aqui.
         j=j+1;
         kk2{j}=II;
-%         figure; imshow(II)
+%         figure; imshow(hsv2rgb(II))
 %         title(['DETECTADA:' num2str(Ic(i))])
-        
+%         
         % PARA DETECTAR NARANJA
-        II=hsv2rgb(II);
-        II4=(2*II(:,:,1)-0.7*II(:,:,2)+0*II(:,:,3));
-        II5=imbinarize((II4),0.99);
-        II5=bwareaopen(II5,1000);
-        se=strel('disk',5);
+%         II=hsv2rgb(II);
+        h=ones(5)/25;
+%         II=imfilter(II,h);
+        II4=(1*II(:,:,1)-0*II(:,:,2)+0*II(:,:,3));
+        II5=imbinarize((1-II4),0.8);
+       % PARA afinar regiones
+        II5=bwareaopen(II5,1500);
+        se=strel('disk',3);
         II5=imclose(II5,se);
+        [L m(i)]=bwlabel(II5);
         Ic2(i)=sum(sum(II5))/caract(i).Area;
-        
+         
         figure; imshow(II5)
-        title([num2str(Ic2(i))])
+        title([num2str(Ic2(i)) 'regiones:' num2str(m(i))])       
+        if  Ic2(i)>0.3&&m(i)<4
+%             figure; imshow(II5)
+%             title(['c3'])
+        end
+
     end
 
 end

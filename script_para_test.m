@@ -47,3 +47,36 @@ imshow(H)
 % figure; imshow(C)
 % figure; imshow(D)
 
+%%
+
+close all
+clear all
+clc
+
+load testsurf
+load testsurf2
+for jj=1:12
+    
+    for ii=1:12
+    I1 = rgb2gray(test{jj});
+    I2 = rgb2gray(test2{ii});
+
+    points1 = detectSURFFeatures(I1);
+    points2 = detectSURFFeatures(I2);
+
+    [f1,vpts1] = extractFeatures(I1,points1);
+    [f2,vpts2] = extractFeatures(I2,points2);
+
+    indexPairs = matchFeatures(f1,f2) ;
+    matchedPoints1 = vpts1(indexPairs(:,1));
+    matchedPoints2 = vpts2(indexPairs(:,2));
+
+    res(ii)=max(size(indexPairs));
+    end
+    prueba(jj)=(find(res==max(res))==jj);
+    % figure; showMatchedFeatures(I1,I2,matchedPoints1,matchedPoints2);
+    % legend('matched points 1','matched points 2');
+end
+prueba
+% size(matchedPoints1)
+
