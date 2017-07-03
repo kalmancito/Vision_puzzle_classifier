@@ -1,6 +1,7 @@
 close all
 clear all
 clc
+warning off
  %%
 %   webcamlist
 % cam = webcam(1)
@@ -15,8 +16,8 @@ clc
 %%
 %    img = snapshot(cam);
 % img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\avion\aviona1.png ');
-img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\testm6.jpg ');
-% img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\puzzle_vision_prueba.png ');
+img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\testm7.jpg ');
+% img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\puzzle_vision_prueba2.png ');
 
 % subplot(1,3,1);imshow(img(:,:,1))
 % subplot(1,3,2);imshow(img(:,:,2))
@@ -27,7 +28,8 @@ img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\testm6.jpg ');
 imshow(img)
 
 I=rgb2gray(img);
-
+I=imadjust(I);
+imshow(I)
 %%
 background = imopen(I,strel('disk',15));
 
@@ -94,28 +96,28 @@ plot(centroids(:,1),centroids(:,2), 'b*')
 hold off
 %% GIRAR EL CUADRADO
 close all
-for kk=1:num
-% imshow(subImage{kk})
-% pause
-II=imcrop(rgb2gray(img),[caract(kk).BoundingBox]);
-%-------------------------------------------
-
-sides = caract(kk).Extrema(4,:) - caract(kk).Extrema(6,:); % Returns the sides of the square triangle that completes th
-
-
-ang = rad2deg(atan2(-sides(2),sides(1))) ;
-
-M=caract(kk).ConvexImage;
-Inew = II(2:end,2:end,:).*uint8(repmat(M,[1,1,1]));
-ROI_c{kk}=Inew;
-
-%------------------------------------------
-ROI_c_r{kk}=imrotate(ROI_c{kk},0,'bilinear');
-ROI_bordes{kk}=edge(ROI_c_r{kk},'sobel');
-
-imshow(ROI_c_r{kk})
-% pause
-end
+% for kk=1:num
+% % imshow(subImage{kk})
+% % pause
+% II=imcrop(rgb2gray(img),[caract(kk).BoundingBox]);
+% %-------------------------------------------
+% 
+% sides = caract(kk).Extrema(4,:) - caract(kk).Extrema(6,:); % Returns the sides of the square triangle that completes th
+% 
+% 
+% ang = rad2deg(atan2(-sides(2),sides(1))) ;
+% 
+% M=caract(kk).ConvexImage;
+% Inew = II(2:end,2:end,:).*uint8(repmat(M,[1,1,1]));
+% ROI_c{kk}=Inew;
+% 
+% %------------------------------------------
+% ROI_c_r{kk}=imrotate(ROI_c{kk},0,'bilinear');
+% ROI_bordes{kk}=edge(ROI_c_r{kk},'sobel');
+% 
+% imshow(ROI_c_r{kk})
+% % pause
+% end
 
 
 % stop
@@ -145,27 +147,56 @@ close all
  clear II II2 II3
  j=0;
 for i=1:num
-% ROI_cH{i}=imcrop(img,[caract(i).ConvexHull]);
 
-% mask=poly2mask(,147,168)
-% ROI_c{i}=imcrop(img,[caract(i).BoundingBox]);
-% ROI_mask{i}=caract(i).ConvexImage;
 II=imcrop(rgb2hsv(img),[caract(i).BoundingBox]);
-% corners{i}=detectSURFFeatures(II,'MetricThreshold',500);
+% PARA DETECTAR GRIS, para las de abajo
 II2=2*II(:,:,1)-II(:,:,2)-II(:,:,3);
+II3=imbinarize((II2),0.6);
+% PARA DETECTAR NARANJA
+% II2=(2*II(:,:,1)-0.7*II(:,:,2)+0*II(:,:,3))./(0.57*(II(:,:,1)+II(:,:,2)+II(:,:,3)));
+% PARA DETECTAR AZUL y naranja, para la piloto.
+% II=hsv2rgb(II);
+% II2=(2*II(:,:,1)-1.5*II(:,:,2)+0*II(:,:,3))./(0.57*(II(:,:,1)+II(:,:,2)+II(:,:,3)));
+% II3=imbinarize(1-(II2),0.9);
 
-II3=imbinarize(II2,0.6);
-figure; imshow(II)
+
+
 Ic(i)=sum(sum(II3))/caract(i).Area;
-title(num2str(Ic(i)))
 
-if(Ic(i))>0.1
-    j=j+1;
+% figure; imshow(II3)
 % title(num2str(Ic(i)))
-title(['detectada: ' num2str(Ic(i))] )
-kk2{j}=II;
-% figure; imshow(II)
-end
+% if(Ic(i)<0.28) % detecta la piloto
+%     title(['DETECTADA:' num2str(Ic(i))])
+% end
+
+% if(Ic(i)>0.7) % detecta cielo.
+%     figure; imshow(II3)
+%     title(['DETECTADA:' num2str(Ic(i))])
+% end
+% figure; imshow(II3)
+% title(num2str(Ic(i)))
+
+        if(Ic(i))>0.1
+            j=j+1;
+        kk2{j}=II;
+        figure; imshow(II)
+        title(['DETECTADA:' num2str(Ic(i))])
+        %------------------------------------------------
+        %una vez detectadas las 4 de abajo, el siguiente paso
+        %es separarlas
+        
+        % PARA C3:
+        II=hsv2rgb(II);
+        II4=(2*II(:,:,1)-0.7*II(:,:,2)+0*II(:,:,3))./(0.57*(II(:,:,1)+II(:,:,2)+II(:,:,3)));
+        II5=imbinarize(II4,0.95);
+        Ic2(j)=sum(sum(II5))/caract(i).Area;
+%         figure; imshow(II5)
+%         title(num2str(Ic2(j)))
+        %------------------------------------------------
+        
+        % figure; imshow(II)
+        end
+        
 %  plot(corners{i}.selectStrongest(10));
 
 
@@ -175,18 +206,18 @@ M=caract(i).ConvexImage;
 % Inew = II(2:end,2:end,:).*uint8(repmat(M,[1,1,3]));
 
 % figure(i*100);imshow(Inew)
-ROI_c{i}=Inew;
-% ang=caract(i).Orientation
+   
 
 %-------------------------------------------
-
-sides = caract(i).Extrema(4,:) - caract(i).Extrema(6,:); % Returns the sides of the square triangle that completes th
-
-
-ang = rad2deg(atan(-sides(2)/sides(1))) ;
+%     % ROI_c{i}=Inew;    
+% 
+%     sides = caract(i).Extrema(4,:) - caract(i).Extrema(6,:); % Returns the sides of the square triangle that completes th
+% 
+% 
+% ang = rad2deg(atan(-sides(2)/sides(1))) ;
 
 %------------------------------------------
-ROI_c_r{i}=imrotate(ROI_c{i},0,'bilinear');
+% ROI_c_r{i}=imrotate(ROI_c{i},0,'bilinear');
 % caract(i).Solidity
 % caract(i).Centroid
 % caract(i).Area
@@ -196,6 +227,11 @@ ROI_c_r{i}=imrotate(ROI_c{i},0,'bilinear');
 % title(num2str(i))
 end
 j
+
+% t=find(Ic2==max(Ic2)); %detect dentro de las de abajo la del ala
+                          % con mas naranja
+% close all
+% figure;imshow(kk2{t})
 stop
 %%
 % 
