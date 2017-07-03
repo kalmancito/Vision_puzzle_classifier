@@ -14,7 +14,7 @@ warning off
 % cam. ExposureMode='auto'
 % % cam.Exposure=-8
 %%
-img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\testm6.jpg ');
+img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\testm3.jpg ');
 
 I=rgb2gray(img);
 % I=imadjust(I);
@@ -87,8 +87,20 @@ Ic(i)=sum(sum(II3))/caract(i).Area;
     if(Ic(i))>0.06
         j=j+1;
         kk2{j}=II;
-        figure; imshow(II)
-        title(['DETECTADA:' num2str(Ic(i))])
+%         figure; imshow(II)
+%         title(['DETECTADA:' num2str(Ic(i))])
+        
+        % PARA DETECTAR NARANJA
+        II=hsv2rgb(II);
+        II4=(2*II(:,:,1)-0.7*II(:,:,2)+0*II(:,:,3));
+        II5=imbinarize((II4),0.99);
+        II5=bwareaopen(II5,1000);
+        se=strel('disk',5);
+        II5=imclose(II5,se);
+        Ic2(i)=sum(sum(II5))/caract(i).Area;
+        
+        figure; imshow(II5)
+        title([num2str(Ic2(i))])
     end
 
 end
