@@ -14,7 +14,8 @@ warning off
 % cam. ExposureMode='auto'
 % % cam.Exposure=-8
 %%
-img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\testm8.jpg ');
+% img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\testm5.jpg ');
+img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\puzzle_vision_prueba.png ');
 
 I=rgb2gray(img);
 % I=imadjust(I);
