@@ -80,3 +80,12 @@ end
 prueba
 % size(matchedPoints1)
 
+%%
+
+I = rgb2gray(test2{5});
+  points =detectHarrisFeatures(I);
+
+figure
+  imshow(I); hold on;
+  plot(points.selectStrongest(20));
+

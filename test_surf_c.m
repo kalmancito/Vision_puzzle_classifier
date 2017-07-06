@@ -3,8 +3,21 @@ close all
 clear all
 clc
 warning off
+ %%
+%   webcamlist
+% cam = webcam(1)
+%    preview(cam)
+% % 
+% %  closePreview(cam)
+% %%
+% %  cam.AvailableResolutions
+% cam.resolution='1280x1024'
+% cam. ExposureMode='auto'
+% % cam.Exposure=-8
 %%
-img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\testm2.jpg ');
+%    img = snapshot(cam);
+%
+img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\trenm1.jpg ');
 % img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\puzzle_vision_prueba.png ');
 
 I=rgb2gray(img);
@@ -72,8 +85,8 @@ for i=1:num
 test2{i}=II;
 end
 %%
-load testsurf
-
+% load testsurf
+load masctren
 
 text_str = cell(num,1);
 for ii=1:num
@@ -98,6 +111,7 @@ for jj=1:num
 
     points1 = detectSURFFeatures(mascara);
     points2 = detectSURFFeatures(imagentest);
+ 
 
     [f1,vpts1] = extractFeatures(mascara,points1);
     [f2,vpts2] = extractFeatures(imagentest,points2);
@@ -172,6 +186,7 @@ end
 
 end
 prueba
+res
 close all
 %%
 close all
