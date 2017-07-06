@@ -17,8 +17,8 @@ warning off
 %%
 %    img = snapshot(cam);
 %5
-for uu=1:4%uu=59:62 %uu=36:57%uu=11:35%
-img=imread(['C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\tren_sem (' num2str(uu) ').jpg']);
+for uu=1:13%uu=59:62 %uu=36:57%uu=11:35%
+% img=imread(['C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\tren_sem (' num2str(uu) ').jpg']);
 img=imread(['C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\tren_ab (' num2str(uu) ').jpg']);
 
 % img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\puzzle_vision_prueba.png ');
@@ -111,9 +111,12 @@ end
 load masctren
 
 text_str = cell(num,1);
+
 for ii=1:num
     text_str{ii}='-';
 end
+labe=text_str;
+
 % load testsurf2
 %  load testsurf3
 %  test=test3;
@@ -161,41 +164,53 @@ for jj=1:num
   
  switch kk
    case 1
-      title('b1')
-      text_str{jj}='c1';
+      labe{jj}=('c1');
+      descriptores(jj)=max(res);
+      text_str{jj}=['c1:' num2str(max(res))];
    case 2
-      title('a1')
-      text_str{jj}='a1';
+      labe{jj}=('a1');
+      descriptores(jj)=max(res);
+      text_str{jj}=['a1:' num2str(max(res))];
    case 3
-      title('c1')
-      text_str{jj}='b1';
+      labe{jj}=('b1');
+      descriptores(jj)=max(res);
+      text_str{jj}=['b1:' num2str(max(res))];
    case 4
-      title('a2')
-      text_str{jj}='c2';
+      labe{jj}=('c2');
+      descriptores(jj)=max(res);
+      text_str{jj}=['c2:' num2str(max(res))];
    case 5
-      title('b2')
-      text_str{jj}='a2';
+      labe{jj}=('a2');
+      descriptores(jj)=max(res);
+      text_str{jj}=['a2:' num2str(max(res))];
    case 6
-      title('c2')
-      text_str{jj}='b2';
+      labe{jj}=('b2');
+      descriptores(jj)=max(res);
+      text_str{jj}=['b2:' num2str(max(res))];
    case 7
-      title('a3')
-      text_str{jj}='c3';
+      labe{jj}=('c3');
+      descriptores(jj)=max(res);
+      text_str{jj}=['c3:' num2str(max(res))];
    case 8
-      title('b3')
-      text_str{jj}='a3';
+      labe{jj}=('a3');
+      descriptores(jj)=max(res);
+      text_str{jj}=['a3:' num2str(max(res))];
     case 9
-      title('c3')
-      text_str{jj}='b3';
+       labe{jj}=('b3');
+      descriptores(jj)=max(res);
+      text_str{jj}=['b3:' num2str(max(res))];
   case 10
-      title('a4')
-      text_str{jj}='a4';
+       labe{jj}=('a4');
+      descriptores(jj)=max(res);
+      text_str{jj}=['a4:' num2str(max(res))];
   case 11
-      title('b4')
-      text_str{jj}='b4';
+      labe{jj}=('b4');
+      descriptores(jj)=max(res);
+      text_str{jj}=['b4:' num2str(max(res))];
   case 12
-      title('c4')
-      text_str{jj}='c4';
+      labe{jj}=('c4');
+      descriptores(jj)=max(res);
+      text_str{jj}=['c4:' num2str(max(res))];
 
      otherwise
                 disp('other value')
@@ -210,6 +225,33 @@ end
 prueba
 res
 close all
+
+%%
+    if num==12
+        labe_bueno={'a3','c2','b1','c4','a1','b2','a2','c1','b4','a4','c3','b3','-'};
+
+        % comprobacion extra repeticiones
+        % buscar vacio y buscar repeticion;
+        % repeticion solucionar con mas alto;
+        % vacio solucionar con sobrante.
+         [~, ind]=unique(labe);
+         duplicate_ind = setdiff(1:length(labe), ind);
+         if ~isempty(duplicate_ind)
+                  
+             duplicate_value = labe{duplicate_ind};
+             pos_rep= find(strcmp(labe, duplicate_value));
+             pos_min=find(min(descriptores(pos_rep))==descriptores);
+             labe{pos_min}='-';
+            % %
+            if length(find(strcmp(labe, '-')))<2
+               labe{pos_min}=setdiff(labe_bueno,labe);
+               text_str{pos_min} =cell2mat(labe{pos_min});
+            end
+        end
+
+        % labe
+    end
+%%
 %%
 close all
 
@@ -226,9 +268,9 @@ for i=1:numel(caract)
    
 end
 % imshow(RGB);   
-saveas(h,['solucion_ab' num2str(uu)],'bmp')
+saveas(h,['solucion_ab2_sol' num2str(uu)],'bmp')
 pause(2)
-clear text_str position
+clear position
 end
 
 %%
