@@ -17,9 +17,10 @@ warning off
 %%
 %    img = snapshot(cam);
 %5
-for uu=35%uu=59:62 %uu=36:57%uu=11:35%uu=1:13%uu=21:35%
-img=imread(['C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\tren_sem (' num2str(uu) ').jpg']);
+for uu=9%uu=59:62 %uu=36:57%uu=11:35%uu=1:13%uu=21:35%
+% img=imread(['C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\tren_sem (' num2str(uu) ').jpg']);
 % img=imread(['C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\tren_ab (' num2str(uu) ').jpg']);
+img=imread(['C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\tren_ex (' num2str(uu) ').jpg']);
 
 % img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\puzzle_vision_prueba.png ');
 % figure;imshow(img)
@@ -62,8 +63,7 @@ title('binarized image')
 
 CC = bwconncomp(bw,4);
 LL = labelmatrix(CC);
-figure
-% imshow(label2rgb(LL));
+% figure;imshow(label2rgb(LL));
 
 
 
@@ -246,8 +246,8 @@ close all
                 labe{pos_min}='-';
                 % %
                 if length(find(strcmp(labe, '-')))==1
-                   labe{pos_min}=setdiff(labe_bueno,labe);
-                   text_str{pos_min} =cell2mat(labe{pos_min});
+                   labe{pos_min}=cell2mat(setdiff(labe_bueno,labe));
+                   text_str{pos_min} =(labe{pos_min});
                 end
              end
          end
@@ -255,8 +255,8 @@ close all
          % falta solo uno por identificar
           if length(find(strcmp(labe, '-')))==1
               indx=find(strcmp(labe, '-'));
-              labe{indx}=setdiff(labe_bueno,labe);
-              text_str{indx} =cell2mat(labe{indx});
+              labe{indx}=cell2mat(setdiff(labe_bueno,labe));
+              text_str{indx} =labe{indx};
           end
 
         % labe
@@ -278,7 +278,7 @@ for i=1:numel(caract)
    
 end
 % imshow(RGB);   
-saveas(h,['sol_' num2str(uu)],'bmp')
+saveas(h,['soluciones_antes_examen' num2str(uu)],'bmp')
 pause(2)
 clear position labe
 end
