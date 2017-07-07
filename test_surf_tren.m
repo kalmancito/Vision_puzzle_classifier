@@ -17,41 +17,41 @@ warning off
 %%
 %    img = snapshot(cam);
 %5
-for uu=1:13%uu=59:62 %uu=36:57%uu=11:35%
-% img=imread(['C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\tren_sem (' num2str(uu) ').jpg']);
-img=imread(['C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\tren_ab (' num2str(uu) ').jpg']);
+for uu=35%uu=59:62 %uu=36:57%uu=11:35%uu=1:13%uu=21:35%
+img=imread(['C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\tren_sem (' num2str(uu) ').jpg']);
+% img=imread(['C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\tren_ab (' num2str(uu) ').jpg']);
 
 % img=imread('C:\Users\Miguel\Desktop\MUAR\1_sem\vision\vision\puzzle_vision_prueba.png ');
 % figure;imshow(img)
 I=rgb2gray(img);
 % I=histeq(I);
-imshow(I)
+% imshow(I)
 %%
 % bw = imbinarize(I,'adaptive');
 % bw = imbinarize(I,'adaptive','ForegroundPolarity','bright','Sensitivity',0.4);
 bw = imbinarize(I);
 bw = imclose(bw, strel('square',25));
 bw = imfill(bw,4,'holes');
-imshow(bw)
+% imshow(bw)
 %%
 bw = bwareaopen(bw,60000,8);
 bw = imfill(bw,'holes');
-imshow(bw)
+% imshow(bw)
 %%
 % kernel = [1;1;1];
  bw = imerode(bw,strel('square',25));
 
-imshow(bw)
+% imshow(bw)
 %%
 
 bw = imfill(bw,'holes');
-imshow(bw)
+% imshow(bw)
 %%
  
 %    bw = imerode(bw,strel('disk',15));
 % bw=edge(bw,'sobel');
 % bw = imfill(bw,[3 3],4);
-imshow(bw)
+% imshow(bw)
 
 %%
 
@@ -63,7 +63,7 @@ title('binarized image')
 CC = bwconncomp(bw,4);
 LL = labelmatrix(CC);
 figure
-imshow(label2rgb(LL));
+% imshow(label2rgb(LL));
 
 
 
@@ -74,7 +74,7 @@ for ii=1:length(STATS)
         if ((abs(STATS(ii).Area-(STATS(ii).Perimeter/4)^2))/STATS(ii).Area<50)&&...
             STATS(ii).Area>90000&&...
             abs(STATS(ii).MajorAxisLength-STATS(ii).MinorAxisLength)<400&...
-            STATS(ii).Solidity>0.6
+            STATS(ii).Solidity>0.6%
             
                 j=j+1;
                 caract(j)=STATS(ii);
@@ -82,8 +82,8 @@ for ii=1:length(STATS)
                 subImage{j} = L(STATS(ii).SubarrayIdx{:});
 %                 figure;imshow(subImage{j});
                 I=subImage{j};
-                I = imerode(I,strel('square',35));
-                figure;imshow(I);
+%                 I = imerode(I,strel('square',35));
+%                 figure;imshow(I);
         end
 end
 num=j
@@ -146,14 +146,15 @@ for jj=1:num
     matchedPoints2 = vpts2(indexPairs(:,2));
 
     res(ii)=length(matchedPoints2);
-    end
-%         figure; showMatchedFeatures(mascara,imagentest,matchedPoints1,matchedPoints2);
+%             figure; showMatchedFeatures(mascara,imagentest,matchedPoints1,matchedPoints2);
 %         legend('matched points 1','matched points 2');
+    end
+
     prueba{jj}=find(res==max(res));
     if(length(prueba{jj})>1)
-        kk=13
+        kk=13;
         prueba{jj}='Null';
-        disp('malo')
+        disp('warning: two match')
         
     else
     kk=prueba{jj};
@@ -222,8 +223,8 @@ end
 
 
 end
-prueba
-res
+% prueba
+% res
 close all
 
 %%
@@ -241,13 +242,22 @@ close all
              duplicate_value = labe{duplicate_ind};
              pos_rep= find(strcmp(labe, duplicate_value));
              pos_min=find(min(descriptores(pos_rep))==descriptores);
-             labe{pos_min}='-';
-            % %
-            if length(find(strcmp(labe, '-')))<2
-               labe{pos_min}=setdiff(labe_bueno,labe);
-               text_str{pos_min} =cell2mat(labe{pos_min});
-            end
-        end
+             if length(find(strcmp(labe, '-')))<2&&length(pos_min)==1
+                labe{pos_min}='-';
+                % %
+                if length(find(strcmp(labe, '-')))==1
+                   labe{pos_min}=setdiff(labe_bueno,labe);
+                   text_str{pos_min} =cell2mat(labe{pos_min});
+                end
+             end
+         end
+         
+         % falta solo uno por identificar
+          if length(find(strcmp(labe, '-')))==1
+              indx=find(strcmp(labe, '-'));
+              labe{indx}=setdiff(labe_bueno,labe);
+              text_str{indx} =cell2mat(labe{indx});
+          end
 
         % labe
     end
@@ -260,7 +270,7 @@ for ii=1:num
    position(ii,1:2)=caract(ii).Extrema(1,:);
 end
 %
-RGB = insertText(img,position,text_str,'FontSize',102,'BoxOpacity',0.4,'TextColor','black');
+RGB = insertText(img,position,labe,'FontSize',102,'BoxOpacity',0.4,'TextColor','black');
 h=figure(555);imshow(RGB); 
 hold on
 for i=1:numel(caract)  
@@ -268,9 +278,9 @@ for i=1:numel(caract)
    
 end
 % imshow(RGB);   
-saveas(h,['solucion_ab2_sol' num2str(uu)],'bmp')
+saveas(h,['sol_' num2str(uu)],'bmp')
 pause(2)
-clear position
+clear position labe
 end
 
 %%
